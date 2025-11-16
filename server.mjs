@@ -38,32 +38,32 @@ const MIME = {
   // HTML 文件
   '.htm': 'text/html; charset=utf-8',
   '.html': 'text/html; charset=utf-8',
-  
+
   // XHTML 文件
   '.xhtml': 'application/xhtml+xml; charset=utf-8',
-  
+
   // CSS 文件
   '.css': 'text/css; charset=utf-8',
-  
+
   // JavaScript 文件
   '.js': 'application/javascript; charset=utf-8',  // 推荐使用 application/javascript
   '.mjs': 'application/javascript; charset=utf-8', // ES6+ 模块化的 JS 文件
-  
+
   // 普通文本文件
   '.txt': 'text/plain; charset=utf-8',
-  
+
   // JSON 数据
   '.json': 'application/json; charset=utf-8',
-  
+
   // Linked Data JSON 文件
   '.jsonld': 'application/ld+json; charset=utf-8',
-  
+
   // 视频文件类型
   '.mp4': 'video/mp4',  // MP4 格式视频
   '.flv': 'video/x-flv',  // FLV 格式视频
   '.ts': 'video/mp2t',  // MPEG2 视频流，通常用于流媒体
   '.avi': 'video/x-msvideo',  // AVI 格式视频
-  
+
   // 音频文件类型
   '.weba': 'audio/webm',  // WebM 格式音频
   '.webm': 'video/webm',  // WebM 格式视频，也可用于音频流
@@ -87,21 +87,21 @@ const MIME = {
   '.ttf': 'font/ttf',  // TrueType 字体格式
   '.eot': 'application/vnd.ms-fontobject',  // Embedded OpenType 字体
   '.otf': 'font/otf',  // OpenType 字体格式
-  
+
   // 常见文档类型
   '.pdf': 'application/pdf',  // PDF 格式文件
   '.csv': 'text/csv; charset=utf-8',  // CSV 文件
   '.xml': 'application/xml; charset=utf-8',  // XML 文件
   '.rtf': 'application/rtf',  // 富文本格式文件
-  
+
   // 常见压缩格式
   '.zip': 'application/zip',  // ZIP 文件格式
   '.rar': 'application/x-rar-compressed',  // RAR 压缩文件格式
-  
+
   // 二进制文件
   '.bin': 'application/octet-stream',  // 二进制流文件
   '.map': 'application/json',  // JavaScript Source Map 文件，通常为 JSON 格式
-  
+
   // WebAssembly 文件
   '.wasm': 'application/wasm',  // WebAssembly 文件类型
 };
@@ -170,6 +170,20 @@ const server = http.createServer(async (req, res) => {
         console.log(`[SSE] client disconnected (${sseClients.size})`);
         checkShutdownCondition();
       });
+      return;
+    }
+
+    if (pathname === '/home') {
+      const htmlContent = `
+        <html>
+          <body>
+            <h1>Welcome to the Home Page</h1>
+            <p>This is a dynamically generated page!</p>
+          </body>
+        </html>
+      `;
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(htmlContent);
       return;
     }
 
