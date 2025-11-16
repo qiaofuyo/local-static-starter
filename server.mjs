@@ -35,21 +35,75 @@ const MAX_PORT = params.port + 10;  // 最多重试 10 次
 
 // ---------- MIME table ----------
 const MIME = {
+  // HTML 文件
+  '.htm': 'text/html; charset=utf-8',
   '.html': 'text/html; charset=utf-8',
-  '.js': 'application/javascript; charset=utf-8',
-  '.mjs': 'application/javascript; charset=utf-8',
+  
+  // XHTML 文件
+  '.xhtml': 'application/xhtml+xml; charset=utf-8',
+  
+  // CSS 文件
   '.css': 'text/css; charset=utf-8',
+  
+  // JavaScript 文件
+  '.js': 'application/javascript; charset=utf-8',  // 推荐使用 application/javascript
+  '.mjs': 'application/javascript; charset=utf-8', // ES6+ 模块化的 JS 文件
+  
+  // 普通文本文件
+  '.txt': 'text/plain; charset=utf-8',
+  
+  // JSON 数据
   '.json': 'application/json; charset=utf-8',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon',
-  '.woff2': 'font/woff2',
-  '.woff': 'font/woff',
-  '.ttf': 'font/ttf',
-  '.map': 'application/octet-stream',
-  '.wasm': 'application/wasm',
+  
+  // Linked Data JSON 文件
+  '.jsonld': 'application/ld+json; charset=utf-8',
+  
+  // 视频文件类型
+  '.mp4': 'video/mp4',  // MP4 格式视频
+  '.flv': 'video/x-flv',  // FLV 格式视频
+  '.ts': 'video/mp2t',  // MPEG2 视频流，通常用于流媒体
+  '.avi': 'video/x-msvideo',  // AVI 格式视频
+  
+  // 音频文件类型
+  '.weba': 'audio/webm',  // WebM 格式音频
+  '.webm': 'video/webm',  // WebM 格式视频，也可用于音频流
+  '.mp3': 'audio/mpeg',  // MP3 音频格式
+  '.aac': 'audio/aac',  // AAC 音频格式
+  '.ogg': 'audio/ogg',  // OGG 音频格式
+  '.flac': 'audio/flac',  // FLAC 音频格式
+  '.midi': 'audio/midi',  // MIDI 音频格式
+
+  // 图片文件类型
+  '.webp': 'image/webp',  // WebP 图片格式
+  '.png': 'image/png',  // PNG 格式图片
+  '.jpg': 'image/jpeg',  // JPEG 格式图片
+  '.jpeg': 'image/jpeg',  // JPEG 格式图片
+  '.svg': 'image/svg+xml',  // SVG 矢量图格式
+  '.ico': 'image/vnd.microsoft.icon',  // Windows 图标文件
+
+  // 字体文件类型
+  '.woff': 'font/woff',  // Web Open Font Format
+  '.woff2': 'font/woff2',  // Web Open Font Format 2
+  '.ttf': 'font/ttf',  // TrueType 字体格式
+  '.eot': 'application/vnd.ms-fontobject',  // Embedded OpenType 字体
+  '.otf': 'font/otf',  // OpenType 字体格式
+  
+  // 常见文档类型
+  '.pdf': 'application/pdf',  // PDF 格式文件
+  '.csv': 'text/csv; charset=utf-8',  // CSV 文件
+  '.xml': 'application/xml; charset=utf-8',  // XML 文件
+  '.rtf': 'application/rtf',  // 富文本格式文件
+  
+  // 常见压缩格式
+  '.zip': 'application/zip',  // ZIP 文件格式
+  '.rar': 'application/x-rar-compressed',  // RAR 压缩文件格式
+  
+  // 二进制文件
+  '.bin': 'application/octet-stream',  // 二进制流文件
+  '.map': 'application/json',  // JavaScript Source Map 文件，通常为 JSON 格式
+  
+  // WebAssembly 文件
+  '.wasm': 'application/wasm',  // WebAssembly 文件类型
 };
 
 // ---------- SSE client tracking ----------
@@ -165,7 +219,6 @@ function checkShutdownCondition() {
     }, Math.max(0, params.shutdownDelayMs));
   }
 }
-
 
 // 端口被占用时显示弹窗
 function showPortOccupiedPopup(port, processInfo) {
