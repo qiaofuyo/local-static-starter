@@ -14,7 +14,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const execAsync = promisify(exec);
 
-// ---------- CONFIG (from argv or defaults) ----------
+/**
+ * 启动服务器的配置参数
+ * @typedef {Object} Params
+ * @property {string} host 服务器绑定的主机（例如 127.0.0.1）
+ * @property {number} port 期望启动的端口
+ * @property {string} webDir 静态文件根目录（绝对路径）
+ * @property {number} shutdownDelayMs 空闲后关闭服务器的延迟毫秒数
+ * @property {boolean} debugMode 是否启用调试模式（在前台运行）
+ */
+
+/** @type {Params} */
 const params = {
   host: '127.0.0.1',
   port: 3000,
@@ -34,6 +44,10 @@ for (let i = 0; i < args.length; i += 2) {
 const MAX_PORT = params.port + 10;  // 最多重试 10 次
 
 // ---------- MIME table ----------
+/**
+ * @type {{[ext:string]:string}}
+ * MIME 类型映射表，键为扩展名（含点），值为 Content-Type
+ */
 const MIME = {
   // HTML 文件
   '.htm': 'text/html; charset=utf-8',
@@ -107,13 +121,25 @@ const MIME = {
 };
 
 // ---------- SSE client tracking ----------
+/** @type {Set<import('http').ServerResponse>} */
 const sseClients = new Set();
 
+/**
+ * 返回 404 响应
+ * @param {import('http').ServerResponse} res
+ */
 function serveNotFound(res) {
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
   res.end('404 Not Found');
 }
 
+/**
+ * 读取并返回指定文件内容
+ * @param {import('http').ServerResponse} res
+ * @param {string} filePath 文件系统路径
+ * @param {Record<string,string>} [headers] 附加响应头
+ * @returns {Promise<void>}
+ */
 async function serveFile(res, filePath, headers = {}) {
   try {
     const buf = await fs.readFile(filePath);
@@ -126,6 +152,12 @@ async function serveFile(res, filePath, headers = {}) {
   }
 }
 
+/**
+ * 向 HTML 注入用于保持 SSE 连接的脚本
+ * 如果未找到 </body> 标签，则附加到文档末尾
+ * @param {string} htmlContent 原始 HTML 字符串
+ * @returns {string} 注入后的 HTML 字符串
+ */
 function injectSseScript(htmlContent) {
   const injection = `
 <!-- injected by local dev server: keep-alive SSE -->
@@ -221,6 +253,9 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
+/**
+ * 检查是否所有 SSE 客户端断开，如果是则延迟关闭服务器
+ */
 function checkShutdownCondition() {
   if (sseClients.size === 0) {
     console.log('No clients connected. Shutting down server in', params.shutdownDelayMs, 'ms ...');
@@ -234,7 +269,11 @@ function checkShutdownCondition() {
   }
 }
 
-// 端口被占用时显示弹窗
+/**
+ * 显示端口被占用的提示（平台相关）
+ * @param {number} port 端口号
+ * @param {{pid:number, name?:string}|null} processInfo 占用端口的进程信息（可为 null）
+ */
 function showPortOccupiedPopup(port, processInfo) {
   const title = '端口被占用';
   const procText = processInfo
@@ -273,7 +312,11 @@ function showPortOccupiedPopup(port, processInfo) {
   }
 }
 
-// 查找占用端口的进程名
+/**
+ * 根据 PID 获取进程名（跨平台）
+ * @param {number} pid 进程 ID
+ * @returns {Promise<string|null>} 返回可读的进程名或 null
+ */
 async function getProcessNameByPid(pid) {
   if (!pid) return null;
 
@@ -299,7 +342,11 @@ async function getProcessNameByPid(pid) {
   }
 }
 
-// 查找占用端口的 PID 和进程名
+/**
+ * 查找占用指定端口的进程信息
+ * @param {number} port 端口号
+ * @returns {Promise<{pid:number, name:string}|null>} 返回 pid 与 name，无法识别时返回 null
+ */
 async function findProcessByPort(port) {
   if (process.platform === 'win32') {
     try {
@@ -338,6 +385,9 @@ async function findProcessByPort(port) {
   }
 }
 
+/**
+ * 监听启动时的动作：打印信息并尝试自动打开浏览器
+ */
 const onListening = () => {
   console.log(`Serving ${params.webDir}`);
   console.log(`HTTP server listening at http://${params.host}:${params.port}`);
@@ -354,6 +404,9 @@ const onListening = () => {
   }
 }
 
+/**
+ * 尝试启动服务器（含端口占用处理与重试逻辑）
+ */
 function tryStart() {
   if (params.port > MAX_PORT) {
     console.error('已尝试太多端口，启动失败');
